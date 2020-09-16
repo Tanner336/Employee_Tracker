@@ -30,7 +30,8 @@ function start() {
       choices: [
         "Add a department/role/employee?",
         "View existing departments/roles/employees?",
-        "Update employee roles?",
+        "Update employee?",
+        "DELETE?!?"
       ]
     })
     .then(function(answer) {
@@ -43,9 +44,14 @@ function start() {
         viewDepRoleEmp();
         break;
 
-      case "Update employee roles?":
-        updateEmpRole();
+      case "Update employee?":
+        updateEmp();
         break;
+
+      case "DELETE?!?":
+        deleteInfo();
+        break;
+  
       }
     });
 };
@@ -91,7 +97,7 @@ function addDep() {
     }]
     )
     .then(function(answer) {
-      console.log("Finished Prompt");
+
       connection.query(
       "INSERT INTO department SET ?",
       {
@@ -131,7 +137,7 @@ function addRole() {
     }]
     )
     .then(function(answer) {
-      console.log("Finished Prompt");
+
       connection.query(
       "INSERT INTO role SET ?",
       {
@@ -180,7 +186,7 @@ function addEmp() {
     }]
     )
     .then(function(answer) {
-      console.log("Finished Prompt");
+
       connection.query(
       "INSERT INTO employee SET ?",
       {
@@ -284,7 +290,7 @@ function viewRole() {
   });
 };
 
-// working
+// console.table isnt working
 function viewEmp() {
   inquirer
   .prompt([{
@@ -333,14 +339,44 @@ function viewAllEmp() {
         role_id: res[i].role_id || 0,
         manager_id: res[i].manager_id || 0
       }])
-      console.log(table)
     }
+    console.log(table)
     start();
   });
 };
+// working
+function updateEmp() {
+  inquirer
+    .prompt({
+      name: "action",
+      type: "rawlist",
+      message: "What would you like to do?",
+      choices: [
+        "Update employee name?",
+        "Update employee role?",
+        "Update employee manager ID?",
+      ]
+    })
+    .then(function(answer) {
+      switch (answer.action) {
+      case "Update employee name?":
+        updateEmpName();
+        break;
+
+      case "Update employee role?":
+        updateEmpRole();
+        break;
+
+      case "Update employee manager ID?":
+        updateEmpManagerId();
+        break;
+      }
+    });
+
+};
 
 // working
-function updateEmpRole() {
+function updateEmpName() {
   inquirer
     .prompt([{
       name: "findEmpId",
@@ -357,26 +393,201 @@ function updateEmpRole() {
       type: "input",
       message: "What is the new last name of the employee?"
     },
-    {
-      name: "updateRoleId",
+  ]
+  )
+  .then(function(answer) {
+    connection.query(
+    `UPDATE employee SET first_name = "${answer.updateFirstName}", last_name = "${answer.updateLastName}" WHERE id = "${answer.findEmpId}"`,
+    function(err) {
+      if (err) throw err;
+      console.log("Employee updated successfully!");
+      start(); 
+    })
+})
+};
+
+// working 
+function updateEmpManagerId() {
+  inquirer
+    .prompt([{
+      name: "findEmpId",
       type: "input",
-      message: "What is the new Role ID of the employee?"
+      message: "What is the ID of the employee you are trying to change?"
     },
     {
       name: "updateManagerId",
       type: "input",
       message: "What is the new Manager ID for the employee?"
-    }]
+    }
+  ]
+  )
+  .then(function(answer) {
+    connection.query(
+    `UPDATE employee SET manager_id = "${answer.updateManagerId}" WHERE id = "${answer.findEmpId}"`,
+    function(err) {
+      if (err) throw err;
+      console.log("Employee updated successfully!");
+      start();
+    })
+})
+};
+
+// working
+function updateEmpRole() {
+  inquirer
+    .prompt([{
+      name: "findEmpId",
+      type: "input",
+      message: "What is the ID of the employee you are trying to change?"
+    },
+    {
+      name: "updateRoleId",
+      type: "input",
+      message: "What is the new Role ID of the employee?"
+    },
+  ]
     )
     .then(function(answer) {
-      console.log("Finished Prompt");
+
       connection.query(
-      `UPDATE employee SET first_name = "${answer.updateFirstName}", last_name = "${answer.updateLastName}", role_id = "${answer.updateRoleId}", manager_id = "${answer.updateManagerId}" WHERE id = "${answer.findEmpId}"`,
+      `UPDATE employee SET role_id = "${answer.updateRoleId}" WHERE id = "${answer.findEmpId}"`,
       function(err) {
         if (err) throw err;
         console.log("Employee updated successfully!");
-        
+        start();
       })
   })
 };
 
+//working
+function deleteInfo() {
+  inquirer
+    .prompt({
+      name: "delete_action",
+      type: "rawlist",
+      message: "What would you like to delete?",
+      choices: [
+        "Delete departments?",
+        "Delete roles?",
+        "Delete employees?"
+      ]
+    })
+    .then(function(answer) {
+      switch (answer.delete_action) {
+      case "Delete departments?":
+        deleteDep();
+        break;
+
+      case "Delete roles?":
+        deleteRole();
+        break;
+
+      case "Delete employees?":
+        deleteEmp();
+        break;
+      }
+    });
+};
+// working
+function deleteDep() {
+  inquirer
+    .prompt([{
+      name: "findDepName",
+      type: "input",
+      message: "What is the Name of the Department you are trying to delete?"
+    }
+  ])
+  .then(function(answer) {
+    connection.query(
+    `DELETE FROM department WHERE name = "${answer.findDepName}"`,
+    function(err) {
+      if (err) throw err;
+      console.log("Department deleted successfully!");
+      start();
+    })
+    // connection.query(
+    //   `SELECT * FROM employee`,function(err, res) {
+    //   function(err) {
+    //     if (err) throw err;
+    //     const table = cTable.getTable([{
+    //       FirstName: res[i].first_name ,
+    //       LastName: res[i].last_name,
+    //       role_id: res[i].role_id || 0,
+    //       manager_id: res[i].manager_id || 0
+    //     }]) 
+    //   }
+    //    console.log(table);
+    //    start(); 
+    //   })
+    // }
+  })
+};
+// working
+function deleteRole() {
+  inquirer
+    .prompt([{
+      name: "findRoleTitle",
+      type: "input",
+      message: "What is the Title of the role you are trying to delete?"
+    }
+  ])
+  .then(function(answer) {
+    connection.query(
+    `DELETE FROM role WHERE title = "${answer.findRoleTitle}"`,
+    function(err) {
+      if (err) throw err;
+      console.log("Role deleted successfully!");
+      start();
+    })
+    // connection.query(
+    //   `SELECT * FROM employee`,function(err, res) {
+    //   function(err) {
+    //     if (err) throw err;
+    //     const table = cTable.getTable([{
+    //       FirstName: res[i].first_name ,
+    //       LastName: res[i].last_name,
+    //       role_id: res[i].role_id || 0,
+    //       manager_id: res[i].manager_id || 0
+    //     }]) 
+    //   }
+    //    console.log(table);
+    //    start(); 
+    //   })
+    // }
+  })
+};
+
+// working
+function deleteEmp() {
+  inquirer
+    .prompt([{
+      name: "findEmpId",
+      type: "input",
+      message: "What is the ID of the employee you are trying to delete?"
+    }
+  ])
+  .then(function(answer) {
+    connection.query(
+    `DELETE FROM employee WHERE id = "${answer.findEmpId}"`,
+    function(err) {
+      if (err) throw err;
+      console.log("Employee deleted successfully!");
+      start();
+    })
+    // connection.query(
+    //   `SELECT * FROM employee`,function(err, res) {
+    //   function(err) {
+    //     if (err) throw err;
+    //     const table = cTable.getTable([{
+    //       FirstName: res[i].first_name ,
+    //       LastName: res[i].last_name,
+    //       role_id: res[i].role_id || 0,
+    //       manager_id: res[i].manager_id || 0
+    //     }]) 
+    //   }
+    //    console.log(table);
+    //    start(); 
+    //   })
+    // }
+  })
+  };
