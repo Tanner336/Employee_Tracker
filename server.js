@@ -231,6 +231,10 @@ function viewDepRoleEmp() {
         viewDep();
         break;
 
+      case "View departments?":
+        viewAllDep();
+        break;
+
       case "View roles?":
         viewRole();
         break;
@@ -251,16 +255,16 @@ function viewDepRoleEmp() {
 function viewDep() {
   connection.query("SELECT * FROM department", function(err, res) {
     if (err) throw err;
-    for(let i =0; i< res.length; i++)
-    console.log(
-      "ID: " +
-      res[i].id +
-      " || Department: " +
-      res[i].name 
-    );
-    start();
+    for(let i = 0; i<res.length; i++) {
+      const table = cTable.getTable([{
+        Department_Name: res[i].name,
+      }])
+      console.log(table)
+    }
+  start();
     });
 };
+
 
 // working
 function viewRole() {
@@ -272,25 +276,22 @@ function viewRole() {
   })
   .then(function(answer) {
     console.log(answer.view_role);
-    connection.query('SELECT * FROM role WHERE title = "' + answer.view_role + `"`, function(err, res) {
+    connection.query('SELECT * FROM role WHERE ?', {title: answer.view_role}, function(err, res) {
       if (err) throw err;
-      for(let i =0; i< res.length; i++)
-      console.log(
-        "ID: " +
-        res[i].id +
-        " || Title: " +
-        res[i].title +
-        " || Salary: " +
-        res[i].salary +
-        " || Department ID: " +
-        res[i].department_id
-      );
-      start();
+      for(let i = 0; i<res.length; i++) {
+        const table = cTable.getTable([{
+          title: res[i].title,
+          salary: res[i].salary,
+          department_id: res[i].department_id || 0
+        }])
+        console.log(table)
+      }
+        start();
     });
   });
 };
 
-// console.table isnt working
+// working
 function viewEmp() {
   inquirer
   .prompt([{
@@ -300,35 +301,23 @@ function viewEmp() {
   },
   ])
   .then(function(answer) {
-    connection.query("SELECT id, first_name, last_name, role_id, manager_id FROM employee WHERE ?", {id: answer.employee_id}, function(err, res) {
+    connection.query("SELECT * FROM employee WHERE ?", {id: answer.employee_id}, function(err, res) {
       if (err) throw err;
       for(let i = 0; i<res.length; i++) {
-        console.log(
-          "ID: " +
-          res[i].id +
-          " || First Name: " +
-          res[i].first_name +
-          " || Last Name: " +
-          res[i].last_name +
-          " || Role ID: " +
-          res[i].role_id +
-          " || Manager ID " +
-          res[i].manager_id
-        )  
-      }
-      // const table = cTable.getTable([{
-      //   first_name: ,
-      //   last_name: answer.addLastName,
-      //   role_id: answer.addRoleId || 0,
-      //   manager_id: answer.addManagerId || 0
-      // }])
-      // console.log(table)
+      const table = cTable.getTable([{
+        first_name: res[i].first_name,
+        last_name: res[i].last_name,
+        role_id: res[i].role_id || 0,
+        manager_id: res[i].manager_id || 0
+      }])
+      console.log(table)
+    }
       start();
     });
   });
 };
 
-// console.table needs work
+// working
 function viewAllEmp() {
   connection.query("SELECT * FROM employee;", function(err, res) {
     if (err) throw err;
@@ -339,8 +328,8 @@ function viewAllEmp() {
         role_id: res[i].role_id || 0,
         manager_id: res[i].manager_id || 0
       }])
+      console.log(table)
     }
-    console.log(table)
     start();
   });
 };
@@ -488,6 +477,7 @@ function deleteInfo() {
       }
     });
 };
+
 // working
 function deleteDep() {
   inquirer
@@ -505,23 +495,9 @@ function deleteDep() {
       console.log("Department deleted successfully!");
       start();
     })
-    // connection.query(
-    //   `SELECT * FROM employee`,function(err, res) {
-    //   function(err) {
-    //     if (err) throw err;
-    //     const table = cTable.getTable([{
-    //       FirstName: res[i].first_name ,
-    //       LastName: res[i].last_name,
-    //       role_id: res[i].role_id || 0,
-    //       manager_id: res[i].manager_id || 0
-    //     }]) 
-    //   }
-    //    console.log(table);
-    //    start(); 
-    //   })
-    // }
   })
 };
+
 // working
 function deleteRole() {
   inquirer
@@ -539,21 +515,6 @@ function deleteRole() {
       console.log("Role deleted successfully!");
       start();
     })
-    // connection.query(
-    //   `SELECT * FROM employee`,function(err, res) {
-    //   function(err) {
-    //     if (err) throw err;
-    //     const table = cTable.getTable([{
-    //       FirstName: res[i].first_name ,
-    //       LastName: res[i].last_name,
-    //       role_id: res[i].role_id || 0,
-    //       manager_id: res[i].manager_id || 0
-    //     }]) 
-    //   }
-    //    console.log(table);
-    //    start(); 
-    //   })
-    // }
   })
 };
 
@@ -574,20 +535,5 @@ function deleteEmp() {
       console.log("Employee deleted successfully!");
       start();
     })
-    // connection.query(
-    //   `SELECT * FROM employee`,function(err, res) {
-    //   function(err) {
-    //     if (err) throw err;
-    //     const table = cTable.getTable([{
-    //       FirstName: res[i].first_name ,
-    //       LastName: res[i].last_name,
-    //       role_id: res[i].role_id || 0,
-    //       manager_id: res[i].manager_id || 0
-    //     }]) 
-    //   }
-    //    console.log(table);
-    //    start(); 
-    //   })
-    // }
   })
   };
