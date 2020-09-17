@@ -5,9 +5,11 @@ https://drive.google.com/file/d/1IWa1OodHBxSrQWebFf-RLWpJxrWIRr0V/view
 
 ## Installation
 You will need to install Mysql, inquirer, and console.table or install the package.json attahced with the application.
+You will also need to set up a MySQL database. Once you have done so you can copy the schema information provided in the file marked databases.sql
 
 ## Description
-This is a simple Content Management System in the command terminal that allows the user to add, view, update, and delete from a stored database. The user may make changes to their department, roles, or employees information from the command line and those changes will be reflected in the database.
+This is a simple Content Management System in the command terminal that allows the user to add, view, update, and delete from a stored database. The user may make changes to their
+department, roles, or employees information from the command line and those changes will be reflected in the database.
 
 ## Contribution Guidelines
 If you wish to contribute or make any improvements, I only ask that you leave the application better than when you found it.
